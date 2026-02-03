@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   backend:
@@ -11,17 +10,16 @@ services:
       - redis
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ats
-      REDIS_HOST: redis
-    volumes:
-      - ./backend:/app
+    networks:
+      - ats-network
 
   ai-service:
     build: ./ai-service
     container_name: ats-ai
     ports:
       - "8000:8000"
-    volumes:
-      - ./ai-service:/app
+    networks:
+      - ats-network
 
   postgres:
     image: postgres:15
@@ -30,11 +28,17 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ats
-    ports:
-      - "5432:5432"
+    networks:
+      - ats-network
 
   redis:
     image: redis:7
     container_name: ats-redis
     ports:
       - "6379:6379"
+    networks:
+      - ats-network
+
+networks:
+  ats-network:
+    driver: bridge
